@@ -11,6 +11,9 @@ from colorama import Fore
 from pystyle import Center, Colors, Colorate
 import os
 import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -180,7 +183,9 @@ def main():
     chrome_options.add_argument('--disable-extensions')
     chrome_options.add_argument("--mute-audio")
     chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(options=chrome_options)
+    
+    cService = webdriver.ChromeService(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=cService)
 
     driver.get(proxy_url)
 
@@ -189,10 +194,20 @@ def main():
         driver.execute_script("window.open('" + random_proxy_url + "')")
         driver.switch_to.window(driver.window_handles[-1])
         driver.get(random_proxy_url)
-
-
+        
+        try:
+            consentBtn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '/html/body/div[8]/div[2]/div[1]/div[2]/div[2]/button[1]'))
+            )
+            consentBtn.click()
+            print("Element found and clicked.")
+        except TimeoutException:
+            print("Element not found. Doing nothing.")
+        
         text_box = driver.find_element(By.ID, 'url')
+        print('HOLA ')
         text_box.send_keys(f'www.twitch.tv/{twitch_username}')
+        print('ADIOS ')
         text_box.send_keys(Keys.RETURN)
         time.sleep(10)
 
@@ -203,25 +218,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# ==========================================
-# Copyright 2023 Kichi779
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-# ==========================================
