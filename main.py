@@ -13,6 +13,7 @@ import os
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+import undetected_chromedriver as uc
 
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -175,7 +176,6 @@ def main():
     driver_path = 'chromedriver.exe'
 
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     chrome_options.add_argument('--disable-logging')
     chrome_options.add_argument("--lang=en")
 
@@ -185,7 +185,8 @@ def main():
     chrome_options.add_argument('--disable-dev-shm-usage')
     
     cService = webdriver.ChromeService(executable_path='/usr/bin/chromedriver')
-    driver = webdriver.Chrome(service=cService)
+    driver = uc.Chrome(service=cService,options=chrome_options)
+    #driver = webdriver.Chrome(service=cService)
 
     driver.get(proxy_url)
 
@@ -205,9 +206,7 @@ def main():
             print("Element not found. Doing nothing.")
         
         text_box = driver.find_element(By.ID, 'url')
-        print('HOLA ')
         text_box.send_keys(f'www.twitch.tv/{twitch_username}')
-        print('ADIOS ')
         text_box.send_keys(Keys.RETURN)
         time.sleep(10)
 
